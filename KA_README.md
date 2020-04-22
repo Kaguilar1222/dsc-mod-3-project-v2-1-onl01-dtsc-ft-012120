@@ -1,13 +1,13 @@
-# Introduction
+# Introduction - Classifying Household Income in the Philippines
 
 For the Module 3 Project, I performed a supervised binary classification exercise on a dataset to predict whether a household earns below or above the median household income in the Philippines. 
 
-My aim as a Data Science student with this exercise is to identify the features of a household that are the strongest indicators of whether a family is earning above the median through several different modeling techniques. 
+My aim as a Data Science student with this exercise is to identify the features of a household that are the strongest indicators of whether a family is earning above the median through several different modeling techniques. There is a high potential for maintaining this project by comparing these results to the survey results everty three years.
 
 ## Libraries
-For data cleaning/exploration: Pandas
-For plotting: Matplotlib.pyplot, Seaborn
-For modeling: scikit-learn, XGBoost
+* For data cleaning/exploration: pandas, NumPy
+* For plotting: Matplotlib, seaborn, Scikit-plot, pydotplus, IPython
+* For modeling: scikit-learn, XGBoost
 
 # The Dataset 
 The Family Income and Expenditure Survey (FIES) from 2015 is available [here on Kaggle](https://www.kaggle.com/grosvenpaul/family-income-and-expenditure) consists of over 40K rows and 60 columns and is collected by the Philippine Statistics Authority every three years. 
@@ -25,34 +25,51 @@ The 59 features are all descriptive of households through spend, household struc
 
 # EDA
 
-I eliminated 10 columns during my EDA phase in three phases. 
+My primary goal was to reduce/condence the number of features in my dataset, optimally to 30-40, and not to add additional dummy variable columns. I eliminated 10 columns during EDA in three phases. 
 1) Object columns with missing values
 2) Object columns with no clear correlation with Household Income based on a countplot
 3) Continuous columns with very few non-zero values
 
-I also converted several columns from object values to one-hot encoded variables where there was a high likelihood of correlation between a variable and income.
+I also converted several columns from object values to one-hot encoded variables where there was a visible correlation between a variable and income.
 
 # Modeling 
 
-I used scikit-learn's train-test split (70/30) to enable model validation for every estimator, and used Pipeline to condense normalization/estimation/grid searching for all models except for LogisticRegression.
+I used scikit-learn's train-test split (70/30) to enable model validation for every estimator, and used Pipeline to condense normalization/estimation/grid searching for all models except for LogisticRegression. Below is a summary table of how each model performed. Please note that due to the result of my Recursive Feature Elimination resulting in 40 columns, from RFE downwards all models only use 40 features.
 
-## Logistic Regression
+<img src="Images/Model%20Comparison.PNG" alt="Model Comparison Dataframe" style="width: 500px;"/>
 
-For my baseline model I used scikit-learn's LogisticRegression class, and normalized the data using. To improve on this estimator I used Recursive Feature Elimination to identify the top 30 variables, which I continued to use throughout the rest of my models. 
-
-## Random Forest
-Show decision tree 
 
 ## XGBoost
+My best model type is XGBoost, which is a weak learning model(here, a decision tree with a low max-depth) that calculates overall loss in order to iterate a new weak learner to minimize loss. 
 
+I iterated on this model as well with a Grid Search, and passed in max-depth, minimum weight of a child(I chose both 1 and 5 to get a try a range of sensitivities) and the number of estimators (10, 30 and 100). 
 
-### Evaluation
+{'xgb__learning_rate': 0.1,
+ 'xgb__max_depth': 5,
+ 'xgb__min_child_weight': 5,
+ 'xgb__n_estimators': 100}
 
-Dataframe of the scores of each model
+# XGBoost Evaluation
 
+The highest performing model across all scores was the XGBoost. As this is a popular model of choice, enabling us to work within the best qualities of ensemble methods and decision trees, using weak learners (decision trees of a fixed size) to identify features of importance. 
 
- - "Why did you select those visualizations and what did you learn from each of them?"
- - "Why did you pick those features as predictors?"
- - "How would you interpret the results?"
- - "How confident are you in the predictive quality of the results?"
- - "What are some of the things that could cause the results to be wrong?"
+Our model returned the following as our most important features:
+
+<img src="Images/XGB_Feature_Importance.png" alt="XG Boost Feature Selection" style="width: 600px;"/>
+
+Unsurprisingly, similar features had also been identified as most significant by our Random Forest model (Food, Communication, Housing/Water, Income From Entrepreneurial Activities, Transportation). 
+
+<img src="Images/RF_Feature_Importance.png" alt="Random Forest Feature Selection" style="width: 600px;"/>
+
+We can also see based on an ROC Curve, showing the tradeoff between false positives and true positives, that these models are hugging the upper left corner. The AUC score for the XGBoost model is high at .98 (the optimal value being 1).
+
+<img src="Images/ROC_Curve.png" alt="XGBoost ROC Curve" style="width: 300px;"/>
+
+In my dataset, we can say with a high degree of confidence that we are able to identify the features that are most correlative to a household's total income. All of these modeling techniques highlighted an ability to accurately identify these above-the-median incomes with some skew towards recall or precision, but XGBoost was the most balanced in terms of performance.
+
+#  Further Work
+**Regional Comparison** As there are seventeen regions with their own major industries/characteristics (tourism, agriculture, urbanization), it would be interesting to compare feature importances between regions, and to see whether models perform better at a regional level where the features are more specific to that area.
+
+**Update Data** This survey takes place every three years, so a comparison of how the spread of expenditures may have been redistributed would be useful to better understand the population spend and to understand how the makeup of the household and how they make/spend money is changing over time; for example, spend on communication was likely much different before smartphones and internet were as accessible and necessary.
+
+**Feature Engineering** Enhancements can be made to reduce the number of expenditures and possessions based on their nature (i.e., meat and fish together, alcohol and tobacco, and perhaps number of large electronics and a category compounding the living condition aspects that could result in a "grade" rather than descriptions of a roof or wall.
