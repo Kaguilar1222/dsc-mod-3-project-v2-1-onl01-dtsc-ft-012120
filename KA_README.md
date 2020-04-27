@@ -36,18 +36,13 @@ I also converted several columns from object values to one-hot encoded variables
 
 I used scikit-learn's train-test split (70/30) to enable model validation for every estimator, and used Pipeline to condense normalization/estimation/grid searching for all models except for LogisticRegression. Below is a summary table of how each model performed. Please note that due to the result of my Recursive Feature Elimination resulting in 40 columns, from RFE downwards all models only use 40 features.
 
-<img src="Images/Model%20Comparison.PNG" alt="Model Comparison Dataframe" style="width: 500px;"/>
+<img src="Images/Model%20Comparison.PNG" alt="Model Comparison Dataframe" style="width: 400px;"/>
 
 
 ## XGBoost
 My best model type is XGBoost, which is a weak learning model(here, a decision tree with a low max-depth) that calculates overall loss in order to iterate a new weak learner to minimize loss. 
 
-I iterated on this model as well with a Grid Search, and passed in max-depth, minimum weight of a child(I chose both 1 and 5 to get a try a range of sensitivities) and the number of estimators (10, 30 and 100). 
-
-{'xgb__learning_rate': 0.1,
- 'xgb__max_depth': 5,
- 'xgb__min_child_weight': 5,
- 'xgb__n_estimators': 100}
+I iterated on this model as well with a Grid Search, and passed in max-depth, minimum weight of a child(I chose both 1 and 5 to get a try a range of sensitivities) and the number of estimators (10, 30 and 100). The best-performing parameters measured by accuracy are learning_rate: 0.1, max_depth: 5, min_child_weight: 5, n_estimators: 100.
 
 # XGBoost Evaluation
 
@@ -55,11 +50,11 @@ The highest performing model across all scores was the XGBoost. As this is a pop
 
 Our model returned the following as our most important features:
 
-<img src="Images/XGB_Feature_Importance.png" alt="XG Boost Feature Selection" style="width: 600px;"/>
+<img src="Images/XGB_Feature_Importance.png" alt="XG Boost Feature Selection" style="width: 400px;"/>
 
 Unsurprisingly, similar features had also been identified as most significant by our Random Forest model (Food, Communication, Housing/Water, Income From Entrepreneurial Activities, Transportation). 
 
-<img src="Images/RF_Feature_Importance.png" alt="Random Forest Feature Selection" style="width: 600px;"/>
+<img src="Images/RF_Feature_Importance.png" alt="Random Forest Feature Selection" style="width: 400px;"/>
 
 We can also see based on an ROC Curve, showing the tradeoff between false positives and true positives, that these models are hugging the upper left corner. The AUC score for the XGBoost model is high at .98 (the optimal value being 1).
 
@@ -68,8 +63,8 @@ We can also see based on an ROC Curve, showing the tradeoff between false positi
 In my dataset, we can say with a high degree of confidence that we are able to identify the features that are most correlative to a household's total income. All of these modeling techniques highlighted an ability to accurately identify these above-the-median incomes with some skew towards recall or precision, but XGBoost was the most balanced in terms of performance.
 
 #  Further Work
-**Regional Comparison** As there are seventeen regions with their own major industries/characteristics (tourism, agriculture, urbanization), it would be interesting to compare feature importances between regions, and to see whether models perform better at a regional level where the features are more specific to that area.
+**Regional Comparison** | As there are seventeen regions with their own major industries/characteristics (tourism, agriculture, urbanization), it would be interesting to compare feature importances between regions, and to see whether models perform better at a regional level where the features are more specific to that area.
 
-**Update Data** This survey takes place every three years, so a comparison of how the spread of expenditures may have been redistributed would be useful to better understand the population spend and to understand how the makeup of the household and how they make/spend money is changing over time; for example, spend on communication was likely much different before smartphones and internet were as accessible and necessary.
+**Update Data** | This survey takes place every three years, so a comparison of how the spread of expenditures may have been redistributed would be useful to better understand the population spend and to understand how the makeup of the household and how they make/spend money is changing over time; for example, spend on communication was likely much different before smartphones and internet were as accessible and necessary.
 
-**Feature Engineering** Enhancements can be made to reduce the number of expenditures and possessions based on their nature (i.e., meat and fish together, alcohol and tobacco, and perhaps number of large electronics and a category compounding the living condition aspects that could result in a "grade" rather than descriptions of a roof or wall.
+**Feature Engineering** | Enhancements can be made to reduce the number of expenditures and possessions based on their nature (i.e., meat and fish together, alcohol and tobacco, and perhaps number of large electronics and a category compounding the living condition aspects that could result in a "grade" rather than descriptions of a roof or wall.
